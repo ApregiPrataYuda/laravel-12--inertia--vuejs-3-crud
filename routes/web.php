@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TagsController;
+
 use Inertia\Inertia;
 // Route::get('/', function () {
 //     return view('welcome');
@@ -18,3 +20,7 @@ Route::get('/about', [AboutController::class, 'index']);
 // Route::resource('category', CategoryController::class);
 // routes/web.php
 Route::match(['get', 'post'], '/category', [CategoryController::class, 'index'])->name('category.index');
+Route::match(['get', 'post'], '/tags', [TagsController::class, 'index'])->name('tags.index');
+
+
+// Route::get('/tags', [TagsController::class, 'index']);

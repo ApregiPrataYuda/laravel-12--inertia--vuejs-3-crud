@@ -1,57 +1,42 @@
 <template>
-  <div>
+  <div class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <!-- Pakai Link, bukan RouterLink -->
         <Link class="navbar-brand" href="/">MyApp</Link>
-        
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <!-- Home -->
             <li class="nav-item">
-              <Link 
-                class="nav-link" 
-                :class="{ active: $page.url === '/' }" 
-                href="/"
-              >
-                Home
-              </Link>
+              <Link class="nav-link" :class="{ active: $page.url === '/' }" href="/">Home</Link>
             </li>
-
-            <!-- About -->
             <li class="nav-item">
-              <Link 
-                class="nav-link" 
-                :class="{ active: $page.url.startsWith('/about') }" 
-                href="/about"
-              >
-                About
-              </Link>
+              <Link class="nav-link" :class="{ active: $page.url.startsWith('/about') }" href="/about">About</Link>
             </li>
-
-
             <li class="nav-item">
-              <Link 
-                class="nav-link" 
-                :class="{ active: $page.url.startsWith('/category') }" 
-                href="/category"
-              >
-                Category
-              </Link>
+              <Link class="nav-link" :class="{ active: $page.url.startsWith('/category') }" href="/category">Category</Link>
+            </li>
+             <li class="nav-item">
+              <Link class="nav-link" :class="{ active: $page.url.startsWith('/tags') }" href="/tags">Tags</Link>
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <!-- Content -->
-    <main class="container mt-4">
+    <!-- Konten utama -->
+    <main class="flex-fill container mt-4">
       <slot />
     </main>
+
+    <!-- Footer -->
+    <FooterLayout />
   </div>
 </template>
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import FooterLayout from './FooterLayout.vue';
 </script>
