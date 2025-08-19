@@ -19,4 +19,16 @@ class TagsModel extends Model
         'name',
         'slug'
     ];
+
+    public static function isTagsExists($name)
+    {
+        return self::where('name', $name)->exists();
+    }
+
+    public static function isTagsExistsEdit($name, $excludeId = null)
+    {
+        return self::where('name', $name)
+            ->where('id', '!=', $excludeId)
+            ->exists();
+    }
 }

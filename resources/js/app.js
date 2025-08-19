@@ -23,6 +23,7 @@ import './bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import '@fortawesome/fontawesome-free/css/all.css';
+import Notifications from '@kyvg/vue3-notification'
 
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
@@ -39,6 +40,7 @@ createInertiaApp({
     createApp({ render: () => h(App, props) })
       .use(plugin)    // pasang plugin Inertia
       .use(pinia)     // pasang Pinia sebelum mount
+      .use(Notifications)  // 🔥 pasang notifications di sini
       .mount(el)
   },
 })

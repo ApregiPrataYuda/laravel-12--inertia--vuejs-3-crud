@@ -21,6 +21,12 @@
              <li class="nav-item">
               <Link class="nav-link" :class="{ active: $page.url.startsWith('/tags') }" href="/tags">Tags</Link>
             </li>
+
+             <li class="nav-item">
+              <Link class="nav-link" :class="{ active: $page.url.startsWith('/tag') }" href="/tag">tags New</Link>
+            </li>
+
+            
           </ul>
         </div>
       </div>
@@ -30,6 +36,9 @@
     <main class="flex-fill container mt-4">
       <slot />
     </main>
+
+     <!-- Notifications Global -->
+    <notifications position="top right" />
 
     <!-- Footer -->
     <FooterLayout />

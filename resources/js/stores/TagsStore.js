@@ -3,8 +3,6 @@ import { defineStore } from 'pinia';
 import { ref, reactive } from 'vue';
 import { router } from '@inertiajs/vue3';
 
-
-
 export const useTagsStore = defineStore('tags', () => {
   // state
   const tags = ref({
@@ -27,10 +25,9 @@ export const useTagsStore = defineStore('tags', () => {
   const sort = reactive({
     column: 'created_at',
     direction: 'desc'
-  })
+  });
 
-
-  // actions
+  // CORE FUNCTION
   function goToPage(p = 1) {
     const payload = {
       page: p,
@@ -56,8 +53,13 @@ export const useTagsStore = defineStore('tags', () => {
     });
   }
 
+  // WRAPPER FUNCTIONS
+  function searchTags() {
+    goToPage(1); // selalu balik ke page 1 saat search
+  }
+
   function changePageSize() {
-    goToPage(1);
+    goToPage(1); // reset ke page 1
   }
 
   function resetFilters() {
@@ -78,9 +80,21 @@ export const useTagsStore = defineStore('tags', () => {
     goToPage(1);
   }
 
-function changeSort() {
-  goToPage(1) // reset ke page 1 supaya konsisten
+  function changeSort() {
+    goToPage(1); // kalau ganti sort di select
+  }
+
+  const sortDirectionIcon = (col) => {
+    if (sort.column !== col) return "fas fa-sort";
+    return sort.direction === "asc"
+      ? "fas fa-arrow-up-wide-short"
+      : "fas fa-arrow-down-wide-short";
+  };
+
+  function rowNumber(index) {
+  return (tags.value.current_page - 1) * perPage.value + (index + 1);
 }
+
 
   function formatDate(dateStr) {
     if (!dateStr) return '-';
@@ -93,7 +107,80 @@ function changeSort() {
     });
   }
 
+
+
+
+const saveTag = async (formData, callbacks = {}) => {
+  try {
+    const res = await axios.post("/tags-store", formData);
+
+    // update state langsung
+    if (tags.value && tags.value.data) {
+      tags.value.data.unshift(res.data.data);
+    }
+
+    callbacks.onSuccess && callbacks.onSuccess(res.data);
+  } catch (error) {
+    if (error.response?.status === 422) {
+      callbacks.onError && callbacks.onError(error.response.data.errors);
+    } else {
+      callbacks.onError && callbacks.onError({ general: [error.response?.data?.message || "Something went wrong"] });
+    }
+  } finally {
+    callbacks.onFinish && callbacks.onFinish();
+  }
+};
+
+
+
+const updateTag = async (formData, callbacks = {}) => {
+  try {
+    const res = await axios.put(`/update-tag/${formData.id}`, formData, {
+      params: { preserveScroll: true, preserveState: true }
+    });
+
+    // update state langsung
+    if (tags.value && tags.value.data) {
+      const idx = tags.value.data.findIndex(tag => tag.id === formData.id);
+      if (idx !== -1) {
+        tags.value.data[idx] = res.data.data;
+      }
+    }
+
+    callbacks.onSuccess && callbacks.onSuccess(res.data);
+  } catch (error) {
+    if (error.response?.status === 422) {
+      callbacks.onError && callbacks.onError(error.response.data.errors);
+    } else {
+      callbacks.onError && callbacks.onError({ general: [error.response?.data?.message || "Something went wrong"] });
+    }
+  } finally {
+    callbacks.onFinish && callbacks.onFinish();
+  }
+};
+
+
+
+const deleteTag = async (id, callbacks = {}) => {
+  try {
+    await axios.delete(`/delete-tag/${id}`);
+    // update state lokal (biar tabel gak reload)
+    tags.value.data = tags.value.data.filter(item => item.id !== id);
+
+    callbacks.onSuccess && callbacks.onSuccess();
+  } catch (error) {
+    if (error.response?.data?.errors) {
+      callbacks.onError && callbacks.onError(error.response.data.errors);
+    }
+  } finally {
+    callbacks.onFinish && callbacks.onFinish();
+  }
+};
+
+
+
   return {
+    // state
     tags,
     search,
     perPage,
@@ -103,11 +190,19 @@ function changeSort() {
     formData,
     errors,
     buttonSaveUpdate,
+
+    // actions
     goToPage,
+    searchTags,
     changePageSize,
     resetFilters,
     toggleSort,
     changeSort,
+    sortDirectionIcon,
+    rowNumber,
     formatDate,
+    saveTag,
+    updateTag,
+    deleteTag
   };
 });
