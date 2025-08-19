@@ -9,6 +9,13 @@ use App\Models\TagsModel;
 use App\Http\Requests\TagsValidation;
 use Illuminate\Validation\ValidationException;
 
+
+
+use App\Exports\TagsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Carbon\Carbon;
+
 class TagController extends Controller
 {
      protected $TagsModel;
@@ -122,5 +129,43 @@ class TagController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+
+    public function show($id)
+        {
+            $tag = TagsModel::find($id);
+            if (!$tag) {
+                return response()->json(['message' => 'Tag tidak ditemukan'], 404);
+            }
+            return response()->json($tag);
+        }
+
+
+       public function export(Request $request)
+    {
+        $params = $request->only(['type', 'month', 'year', 'start_date', 'end_date']);
+        
+        $query = TagsModel::query();
+
+        if (isset($params['type']) && $params['type'] === 'month' && isset($params['month']) && isset($params['year'])) {
+            $query->whereYear('created_at', $params['year'])
+                  ->whereMonth('created_at', $params['month']);
+        } elseif (isset($params['type']) && $params['type'] === 'date' && isset($params['start_date']) && isset($params['end_date'])) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($params['start_date'])->startOfDay(),
+                Carbon::parse($params['end_date'])->endOfDay()
+            ]);
+        } elseif (isset($params['type']) && $params['type'] === 'year' && isset($params['year'])) {
+            $query->whereYear('created_at', $params['year']);
+        }
+        
+        // Cek apakah ada data yang ditemukan
+        if ($query->count() === 0) {
+            return response()->json(['message' => 'Tidak ada data laporan untuk kriteria yang dipilih.'], 404);
+        }
+
+        $fileName = 'tags-report.xlsx';
+        return Excel::download(new TagsExport($params), $fileName);
     }
 }

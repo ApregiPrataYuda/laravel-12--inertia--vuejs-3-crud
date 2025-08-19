@@ -119,7 +119,39 @@ export const useTagsStore = defineStore('tags', {
       month: 'long',
       day: '2-digit',
     });
-  }
+  },
+
+
+    async fetchTagDetail(id) {
+    this.loading = true;
+    try {
+        const res = await axios.get(`/tag/${id}`);
+        this.formData = res.data; // bisa langsung tampil di modal/detail component
+    } catch (err) {
+        console.error(err);
+    } finally {
+        this.loading = false;
+    }
+    },
+
+async exportTags(params) {
+            try {
+                // Panggilan API untuk ekspor laporan dengan responseType 'blob'
+                const response = await axios.get('/tags/export', { 
+                    params: params,
+                    responseType: 'blob' 
+                });
+                
+                // Mengembalikan respons sukses ke komponen
+                return response;
+
+            } catch (err) {
+                // Melempar error ke komponen untuk penanganan UI
+                throw err;
+            }
+        }
+
+
 
   }
 })

@@ -41,4 +41,7 @@ Route::get('/tag/data', [TagController::class, 'getData'])->name('tag.data');
 Route::post('/tag', [TagController::class, 'store'])->name('tag.store');
 Route::put('/tag/{id}', [TagController::class, 'update'])->name('tag.update');
 Route::delete('/tag/{id}', [TagController::class, 'destroy'])->name('tag.delete');
-Route::post('/tag/delete-many', [TagController::class, 'deleteMany'])->name('tags.deleteMany');
+Route::post('/tag/delete-many', [TagController::class, 'deleteMany'])->name('tag.deleteMany');
+Route::get('/tag/{id}', [TagController::class, 'show'])->name('tag.show');
+// Route::get('/tag/export', [TagController::class, 'export'])->name('tag.export');
+Route::get('/tags/export', [TagController::class, 'export']);
